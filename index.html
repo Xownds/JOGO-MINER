@@ -137,7 +137,8 @@ transform:translateY(-60px);
 
 const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
-
+const minerSprite = new Image();
+minerSprite.src = "miner.png";
 function resize(){
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
@@ -300,8 +301,6 @@ if(d<dist){
 
 dist=d;
 nearest=rock;
-
-}
 
 }
 
@@ -659,143 +658,13 @@ Math.PI*2
 ctx.fill();
 
 }
-ctx.save();
-
-const legOffset =
-Math.sin(player.walkTime)*6;
-
-ctx.strokeStyle="#1976d2";
-ctx.lineWidth=5;
-
-ctx.beginPath();
-
-ctx.moveTo(
-canvas.width/2-5,
-canvas.height/2+18
+ctx.drawImage(
+minerSprite,
+canvas.width/2-32,
+canvas.height/2-32,
+64,
+64
 );
-
-ctx.lineTo(
-canvas.width/2-5,
-canvas.height/2+30+legOffset
-);
-
-ctx.stroke();
-
-ctx.beginPath();
-
-ctx.moveTo(
-canvas.width/2+5,
-canvas.height/2+18
-);
-
-ctx.lineTo(
-canvas.width/2+5,
-canvas.height/2+30-legOffset
-);
-
-ctx.stroke();
-ctx.fillStyle="rgba(0,0,0,0.3)";
-
-ctx.beginPath();
-
-ctx.ellipse(
-canvas.width/2,
-canvas.height/2+22,
-22,
-10,
-0,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-ctx.fillStyle="#4fc3f7";
-
-ctx.beginPath();
-
-ctx.arc(
-canvas.width/2,
-canvas.height/2,
-24,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-ctx.fillStyle="#81d4fa";
-
-ctx.beginPath();
-
-ctx.arc(
-canvas.width/2-6,
-canvas.height/2-6,
-6,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-ctx.fillStyle="white";
-
-ctx.beginPath();
-
-ctx.arc(
-canvas.width/2-5,
-canvas.height/2-3,
-2,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-ctx.save();
-
-ctx.translate(
-canvas.width/2,
-canvas.height/2
-);
-
-let pickaxeAngle=
-player.mining ? -1.2 : -0.3;
-
-ctx.rotate(
-pickaxeAngle
-);
-
-ctx.fillStyle="#8d6e63";
-
-ctx.fillRect(
-15,
--2,
-22,
-4
-);
-
-ctx.fillStyle="#cfd8dc";
-
-ctx.fillRect(
-30,
--7,
-10,
-14
-);
-
-ctx.restore();
-ctx.beginPath();
-
-ctx.arc(
-canvas.width/2+5,
-canvas.height/2-3,
-2,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-}
 
 function loop(){
 

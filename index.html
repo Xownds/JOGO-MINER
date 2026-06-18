@@ -117,7 +117,9 @@ transform:translateY(-60px);
 <div id="hud">
 <div>Nível <span id="level">1</span></div>
 <div>XP <span id="xp">0</span>/<span id="nextXp">100</span></div>
-
+<div id="ores">
+⚫ 0 | ⚙ 0 | 🟡 0
+</div>
 <div id="xpBar">
 <div id="xpFill"></div>
 </div>
@@ -147,6 +149,9 @@ const player={
 x:500,
 y:500,
 size:48,
+angle:0,
+mining:false,
+walkTime:0,
 speed:1.5
 };
 
@@ -158,7 +163,11 @@ y:0
 let level=1;
 let xp=0;
 let nextXp=100;
-
+const inventory = {
+coal:0,
+iron:0,
+gold:0
+};
 const keys={};
 
 document.addEventListener("keydown",e=>{
@@ -170,14 +179,28 @@ keys[e.key.toLowerCase()]=false;
 });
 
 const rocks=[];
-
+const drops=[];
 for(let i=0;i<12;i++){
+const types=[
+"coal",
+"iron",
+"gold"
+];
+
+const type=
+types[
+Math.floor(Math.random()*types.length)
+];
+
 rocks.push({
 x:Math.random()*1800+100,
 y:Math.random()*1800+100,
 size:70,
-hp:5,
-maxHp:5,
+type:type,
+hp:type==="gold"?10:
+type==="iron"?7:5,
+maxHp:type==="gold"?10:
+type==="iron"?7:5,
 alive:true,
 respawn:0
 });
@@ -226,7 +249,12 @@ document.getElementById(
 "xpFill"
 ).style.width=
 (xp/nextXp*100)+"%";
-
+document.getElementById(
+"ores"
+).innerHTML=
+`⚫ ${inventory.coal}
+ | ⚙ ${inventory.iron}
+ | 🟡 ${inventory.gold}`;
 }
 
 function floatText(text,x,y){
@@ -249,17 +277,23 @@ el.remove();
 }
 
 function mineRock(){
+player.mining=true;
 
+setTimeout(()=>{
+
+player.mining=false;
+
+},150);
 let nearest=null;
-let dist=100;
+let dist=130;
 
 for(const rock of rocks){
 
 if(!rock.alive) continue;
 
 const d=Math.hypot(
-player.x-rock.x,
-player.y-rock.y
+player.x-(rock.x+rock.size/2),
+player.y-(rock.y+rock.size/2)
 );
 
 if(d<dist){
@@ -282,7 +316,14 @@ canvas.height/2
 );
 
 if(nearest.hp<=0){
+drops.push({
 
+x:nearest.x,
+y:nearest.y,
+
+type:nearest.type
+
+});
 nearest.alive=false;
 
 nearest.respawn=300;
@@ -403,6 +444,12 @@ player.x += moveX * player.speed;
 player.y += moveY * player.speed;
 
 }
+if(
+Math.abs(moveX)>0 ||
+Math.abs(moveY)>0
+){
+player.walkTime+=0.2;
+}
 
 player.x+=joyX*player.speed;
 player.y+=joyY*player.speed;
@@ -429,7 +476,36 @@ rock.hp=rock.maxHp;
 }
 
 }
+for(let i=drops.length-1;i>=0;i--){
 
+const drop=drops[i];
+
+const d=Math.hypot(
+player.x-drop.x,
+player.y-drop.y
+);
+
+if(d<60){
+
+if(drop.type==="coal"){
+inventory.coal++;
+}
+
+if(drop.type==="iron"){
+inventory.iron++;
+}
+
+if(drop.type==="gold"){
+inventory.gold++;
+}
+
+drops.splice(i,1);
+
+updateHUD();
+
+}
+
+}
 }
 
 function draw(){
@@ -479,7 +555,18 @@ const sx=
 
 const sy=
 (rock.y-camera.y)*zoom;
-ctx.fillStyle="#555";
+if(rock.type==="coal"){
+ctx.fillStyle="#222";
+}
+
+if(rock.type==="iron"){
+ctx.fillStyle="#888";
+}
+
+if(rock.type==="gold"){
+ctx.fillStyle="#ffd700";
+}
+
 
 ctx.beginPath();
 
@@ -539,8 +626,74 @@ rock.size*
 );
 
 }
+for(const drop of drops){
 
+const dx=
+drop.x-camera.x;
 
+const dy=
+drop.y-camera.y;
+
+if(drop.type==="coal"){
+ctx.fillStyle="#111";
+}
+
+if(drop.type==="iron"){
+ctx.fillStyle="#ccc";
+}
+
+if(drop.type==="gold"){
+ctx.fillStyle="#ffd700";
+}
+
+ctx.beginPath();
+
+ctx.arc(
+dx,
+dy,
+12,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+}
+ctx.save();
+
+const legOffset =
+Math.sin(player.walkTime)*6;
+
+ctx.strokeStyle="#1976d2";
+ctx.lineWidth=5;
+
+ctx.beginPath();
+
+ctx.moveTo(
+canvas.width/2-5,
+canvas.height/2+18
+);
+
+ctx.lineTo(
+canvas.width/2-5,
+canvas.height/2+30+legOffset
+);
+
+ctx.stroke();
+
+ctx.beginPath();
+
+ctx.moveTo(
+canvas.width/2+5,
+canvas.height/2+18
+);
+
+ctx.lineTo(
+canvas.width/2+5,
+canvas.height/2+30-legOffset
+);
+
+ctx.stroke();
 ctx.fillStyle="rgba(0,0,0,0.3)";
 
 ctx.beginPath();
@@ -598,7 +751,39 @@ Math.PI*2
 );
 
 ctx.fill();
+ctx.save();
 
+ctx.translate(
+canvas.width/2,
+canvas.height/2
+);
+
+let pickaxeAngle=
+player.mining ? -1.2 : -0.3;
+
+ctx.rotate(
+pickaxeAngle
+);
+
+ctx.fillStyle="#8d6e63";
+
+ctx.fillRect(
+15,
+-2,
+22,
+4
+);
+
+ctx.fillStyle="#cfd8dc";
+
+ctx.fillRect(
+30,
+-7,
+10,
+14
+);
+
+ctx.restore();
 ctx.beginPath();
 
 ctx.arc(

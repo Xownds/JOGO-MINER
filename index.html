@@ -146,7 +146,7 @@ window.addEventListener("resize",resize);
 const player={
 x:500,
 y:500,
-size:40,
+size:48,
 speed:1.5
 };
 
@@ -171,11 +171,11 @@ keys[e.key.toLowerCase()]=false;
 
 const rocks=[];
 
-for(let i=0;i<15;i++){
+for(let i=0;i<12;i++){
 rocks.push({
 x:Math.random()*1800+100,
 y:Math.random()*1800+100,
-size:60,
+size:70,
 hp:5,
 maxHp:5,
 alive:true,
@@ -251,7 +251,7 @@ el.remove();
 function mineRock(){
 
 let nearest=null;
-let dist=70;
+let dist=100;
 
 for(const rock of rocks){
 
@@ -353,11 +353,12 @@ e.touches[0];
 
 let x=
 touch.clientX-
-(rect.left+60);
+(rect.left+70);
+
 
 let y=
 touch.clientY-
-(rect.top+60);
+(rect.top+70);
 
 const len=
 Math.hypot(x,y);
@@ -373,10 +374,10 @@ joyX=x/40;
 joyY=y/40;
 
 stick.style.left=
-(35+x)+"px";
+(40+x)+"px";
 
 stick.style.top=
-(35+y)+"px";
+(40+y)+"px";
 
 }
 );
@@ -439,25 +440,46 @@ canvas.width,
 canvas.height
 );
 
-ctx.fillStyle="#3f7d3f";
+ctx.fillStyle="#4b8b3b";
 
 ctx.fillRect(
-0,0,
+0,
+0,
 canvas.width,
 canvas.height
 );
+
+// textura simples
+
+for(let x=0;x<canvas.width;x+=40){
+
+    for(let y=0;y<canvas.height;y+=40){
+
+        ctx.fillStyle="rgba(255,255,255,0.03)";
+
+        ctx.fillRect(
+            x,
+            y,
+            2,
+            2
+        );
+
+    }
+
+}
 
 for(const rock of rocks){
 
 if(!rock.alive) continue;
 
+const zoom = 1.5;
+
 const sx=
-rock.x-camera.x;
+(rock.x-camera.x)*zoom;
 
 const sy=
-rock.y-camera.y;
-
-ctx.fillStyle="#7a7a7a";
+(rock.y-camera.y)*zoom;
+ctx.fillStyle="#555";
 
 ctx.beginPath();
 
@@ -470,7 +492,32 @@ Math.PI*2
 );
 
 ctx.fill();
+
+ctx.fillStyle="#777";
+
+ctx.beginPath();
+
+ctx.arc(
+sx + rock.size*0.35,
+sy + rock.size*0.35,
+rock.size*0.12,
+0,
+Math.PI*2
 );
+
+ctx.fill();
+
+ctx.beginPath();
+
+ctx.arc(
+sx + rock.size*0.65,
+sy + rock.size*0.55,
+rock.size*0.10,
+0,
+Math.PI*2
+);
+
+ctx.fill();
 
 ctx.fillStyle="red";
 
@@ -493,6 +540,23 @@ rock.size*
 
 }
 
+
+ctx.fillStyle="rgba(0,0,0,0.3)";
+
+ctx.beginPath();
+
+ctx.ellipse(
+canvas.width/2,
+canvas.height/2+22,
+22,
+10,
+0,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
 ctx.fillStyle="#4fc3f7";
 
 ctx.beginPath();
@@ -500,7 +564,21 @@ ctx.beginPath();
 ctx.arc(
 canvas.width/2,
 canvas.height/2,
-20,
+24,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+ctx.fillStyle="#81d4fa";
+
+ctx.beginPath();
+
+ctx.arc(
+canvas.width/2-6,
+canvas.height/2-6,
+6,
 0,
 Math.PI*2
 );
@@ -510,25 +588,28 @@ ctx.fill();
 ctx.fillStyle="white";
 
 ctx.beginPath();
+
 ctx.arc(
-canvas.width/2-6,
-canvas.height/2-4,
+canvas.width/2-5,
+canvas.height/2-3,
 2,
 0,
 Math.PI*2
 );
+
 ctx.fill();
 
 ctx.beginPath();
+
 ctx.arc(
-canvas.width/2+6,
-canvas.height/2-4,
+canvas.width/2+5,
+canvas.height/2-3,
 2,
 0,
 Math.PI*2
 );
-ctx.fill();
 
+ctx.fill();
 }
 
 function loop(){

@@ -74,8 +74,8 @@ transform:scale(.95);
 position:fixed;
 left:20px;
 bottom:20px;
-width:120px;
-height:120px;
+width:140px;
+height:140px;
 background:rgba(255,255,255,.15);
 border-radius:50%;
 z-index:20;
@@ -83,8 +83,8 @@ z-index:20;
 
 #stick{
 position:absolute;
-width:50px;
-height:50px;
+width:60px;
+height:60px;
 left:35px;
 top:35px;
 border-radius:50%;
@@ -146,8 +146,8 @@ window.addEventListener("resize",resize);
 const player={
 x:500,
 y:500,
-size:32,
-speed:3
+size:40,
+speed:1.5
 };
 
 const camera={
@@ -171,12 +171,11 @@ keys[e.key.toLowerCase()]=false;
 
 const rocks=[];
 
-for(let i=0;i<25;i++){
-
+for(let i=0;i<15;i++){
 rocks.push({
 x:Math.random()*1800+100,
 y:Math.random()*1800+100,
-size:40,
+size:60,
 hp:5,
 maxHp:5,
 alive:true,
@@ -335,8 +334,8 @@ dragging=false;
 joyX=0;
 joyY=0;
 
-stick.style.left="35px";
-stick.style.top="35px";
+stick.style.left="40px";
+stick.style.top="40px";
 }
 );
 
@@ -384,10 +383,25 @@ stick.style.top=
 
 function update(){
 
-if(keys["w"]) player.y-=player.speed;
-if(keys["s"]) player.y+=player.speed;
-if(keys["a"]) player.x-=player.speed;
-if(keys["d"]) player.x+=player.speed;
+let moveX = 0;
+let moveY = 0;
+
+if(keys["w"]) moveY--;
+if(keys["s"]) moveY++;
+if(keys["a"]) moveX--;
+if(keys["d"]) moveX++;
+
+let length = Math.hypot(moveX, moveY);
+
+if(length > 0){
+
+moveX /= length;
+moveY /= length;
+
+player.x += moveX * player.speed;
+player.y += moveY * player.speed;
+
+}
 
 player.x+=joyX*player.speed;
 player.y+=joyY*player.speed;
@@ -443,13 +457,19 @@ rock.x-camera.x;
 const sy=
 rock.y-camera.y;
 
-ctx.fillStyle="#8d8d8d";
+ctx.fillStyle="#7a7a7a";
 
-ctx.fillRect(
-sx,
-sy,
-rock.size,
-rock.size
+ctx.beginPath();
+
+ctx.arc(
+sx + rock.size/2,
+sy + rock.size/2,
+rock.size/2,
+0,
+Math.PI*2
+);
+
+ctx.fill();
 );
 
 ctx.fillStyle="red";
@@ -473,14 +493,41 @@ rock.size*
 
 }
 
-ctx.fillStyle="#2196f3";
+ctx.fillStyle="#4fc3f7";
 
-ctx.fillRect(
-canvas.width/2-player.size/2,
-canvas.height/2-player.size/2,
-player.size,
-player.size
+ctx.beginPath();
+
+ctx.arc(
+canvas.width/2,
+canvas.height/2,
+20,
+0,
+Math.PI*2
 );
+
+ctx.fill();
+
+ctx.fillStyle="white";
+
+ctx.beginPath();
+ctx.arc(
+canvas.width/2-6,
+canvas.height/2-4,
+2,
+0,
+Math.PI*2
+);
+ctx.fill();
+
+ctx.beginPath();
+ctx.arc(
+canvas.width/2+6,
+canvas.height/2-4,
+2,
+0,
+Math.PI*2
+);
+ctx.fill();
 
 }
 
